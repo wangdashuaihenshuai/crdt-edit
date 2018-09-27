@@ -1,0 +1,6 @@
+const { State } = require('./lib')
+const state = new State(0, 0)
+state.update('123456')
+state.update('4567')
+state.update('888')
+console.log(state.toString())
