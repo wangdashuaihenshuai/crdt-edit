@@ -9,7 +9,7 @@ var layer = new Konva.Layer()
 const r = 40
 const boxX = 80
 const boxY = 60
-const drawNode = function ({ x, y, isDelete, value }) {
+const drawNode = function ({ x, y, id, isDelete, value }, preNode) {
   const circle = new Konva.Circle({
     radius: r / 2,
     x,
@@ -18,8 +18,11 @@ const drawNode = function ({ x, y, isDelete, value }) {
     stroke: 'black',
     strokeWidth: 5
   })
+  layer.add(circle)
+}
+
+const drawText = function ({ x, y, id, isDelete, value }, preNode) {
   const t = JSON.stringify(value)
-  console.log('draw node', t)
   const text = new Konva.Text({
     x: x - 8,
     y: y - 15,
@@ -28,13 +31,22 @@ const drawNode = function ({ x, y, isDelete, value }) {
     fontFamily: 'Calibri',
     fill: 'white'
   })
-
-  layer.add(circle)
   layer.add(text)
 }
-
-const drawArrw = function (arrw) {
-
+const drawArraw = function ({ x, y, id, isDelete, value }, preNode) {
+  if (id !== preNode.id) {
+    const arrow = new Konva.Arrow({
+      x: 0,
+      y: 0,
+      points: [x, y, preNode.x, preNode.y],
+      pointerLength: 8,
+      pointerWidth: 8,
+      fill: 'black',
+      stroke: 'black',
+      strokeWidth: 5
+    })
+    layer.add(arrow)
+  }
 }
 
 const draw = function (tree) {
@@ -50,8 +62,10 @@ const draw = function (tree) {
       info = {}
     }
     info.x = x
+    info.id = node.word.id.toString()
     info.value = node.word.value
     info.isDelete = node.word.isDelete
+    info.preId = node.word.preId.toString()
     ns.set(node.word.id.toString(), info)
   }
 
@@ -65,14 +79,17 @@ const draw = function (tree) {
   }
   const getWidth = function (tree, left) {
     if (tree.nextNode.length <= 0) {
-      return boxX + left
+      setX(tree, left + boxX / 2)
+      return boxX
     }
+    let w = 0
     for (let n of tree.nextNode) {
-      left = getWidth(n, left)
-      setX(n, left)
+      w = w + getWidth(n, left + w)
     }
-    return left
+    setX(tree, left + w / 2)
+    return w
   }
+
   const getHight = function (tree, h) {
     setY(tree, h)
     if (tree.nextNode.length <= 0) return h
@@ -80,14 +97,25 @@ const draw = function (tree) {
       getHight(n, h + boxY)
     }
   }
-  const w = getWidth(tree, 0)
-  setX(tree, w)
+  getWidth(tree, 0)
   getHight(tree, r)
   console.log(ns)
+
   for (let node of ns.values()) {
-    console.log(node)
-    drawNode(node)
+    const preNode = ns.get(node.preId)
+    drawArraw(node, preNode)
   }
+
+  for (let node of ns.values()) {
+    const preNode = ns.get(node.preId)
+    drawNode(node, preNode)
+  }
+
+  for (let node of ns.values()) {
+    const preNode = ns.get(node.preId)
+    drawText(node, preNode)
+  }
+
   layer.draw()
   window.l = layer
 }

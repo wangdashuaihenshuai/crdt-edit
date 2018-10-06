@@ -152,18 +152,18 @@ class Node {
   }
 
   getNodeByposition (position) {
-    console.log(this.toJSON())
     if (position <= 0) {
-      return this.word.id
+      return { node: this, position }
     }
     for (let n of this.nextNode) {
       if (!n.word.isDelete) {
         position = position - 1
       }
       const re = n.getNodeByposition(position)
-      if (re !== null) return re
+      if (re.node !== null) return re
+      position = re.position
     }
-    return null
+    return { node: null, position }
   }
 
   getStr () {
@@ -203,7 +203,6 @@ class State {
           i = chars.length - 1
           chars.reverse()
         }
-        console.log(info)
         for (let char of chars) {
           preId = this.getPreId(oldAction.position + i)
           console.log('get preId', preId, oldAction.position + i)
@@ -224,8 +223,6 @@ class State {
 
   update (newStr) {
     const oldStr = this.toString()
-    console.log('newStr', newStr)
-    console.log('oldStr', oldStr)
     const oldActions = diff(oldStr, newStr)
     this.addOldActins(oldActions)
     return this.toString()
@@ -236,7 +233,8 @@ class State {
   }
 
   getPreId (position) {
-    return this.tree.getNodeByposition(position)
+    const { node } = this.tree.getNodeByposition(position)
+    return node && node.word.id
   }
 
   addAction (action) {

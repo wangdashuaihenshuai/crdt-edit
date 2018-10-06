@@ -9,14 +9,16 @@ const { loadActionsInfo } = require('./lib')
 
 app.use(express.static(path.join(__dirname, 'public')))
 
+let allActions = []
 io.on('connection', (socket) => {
   const uid = serverState.uidManager.getId()
   const timeStamp = serverState.timeStampManager.getTimeStamp()
-  const actionsInfo = JSON.stringify([...serverState.nodes.values()])
+  const actionsInfo = JSON.stringify(allActions)
   socket.emit('client-init', { uid, timeStamp, actionsInfo })
 
   socket.on('client-actions', (actionsInfo) => {
     const actions = loadActionsInfo(actionsInfo)
+    allActions = allActions.concat(actions)
     for (let action of actions) {
       serverState.addAction(action)
       console.log('barodcast')

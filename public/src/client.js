@@ -2,7 +2,7 @@ const io = require('socket.io-client')
 
 const { State } = require('./lib')
 
-const socket = io('http://10.12.51.216:8888/')
+const socket = io('http://localhost:8888')
 
 class ClientState extends State {
   addAction (action) {
