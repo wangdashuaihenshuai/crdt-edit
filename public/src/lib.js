@@ -205,7 +205,6 @@ class State {
         }
         for (let char of chars) {
           preId = this.getPreId(oldAction.position + i)
-          console.log('get preId', preId, oldAction.position + i)
           if (info.operat === DELETE) {
             i--
           } else {
@@ -241,8 +240,6 @@ class State {
     if (this.nodes.get(action.id.toString())) {
       return
     }
-    console.log(action.toString(), action)
-    console.log(action)
     const node = this.nodes.get(action.preId.toString())
     switch (action.operat) {
       case ADD:
@@ -250,7 +247,6 @@ class State {
         const word = new Word(action.id, action.value, action.preId, action.operat)
         const newNode = new Node(word)
         this.nodes.set(id.toString(), newNode)
-        console.log('add node', node)
         node.addNext(newNode)
         break
       case DELETE:

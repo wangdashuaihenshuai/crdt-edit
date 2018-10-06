@@ -21,7 +21,7 @@ io.on('connection', (socket) => {
     allActions = allActions.concat(actions)
     for (let action of actions) {
       serverState.addAction(action)
-      console.log('barodcast')
+      console.log('barodcast', action.toString())
       socket.broadcast.emit('server-actions', actionsInfo)
     }
   })
